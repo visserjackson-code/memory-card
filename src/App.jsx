@@ -4,6 +4,15 @@ import { useState } from "react";
 import { WinMessage } from "./components/WinMessage";
 
 
+
+const getRandomPokemonSprite = async () => {
+  const dexNumber = Math.random * (1025 - 1 + 1) - 1
+  const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${dexNumber}`);
+  const data = await response.json;
+  return data.sprites.other.showdown.front_default ?? data.sprites.front_default;
+}
+
+
 const cardValues = [
   "🍎",
   "🍌",
