@@ -1,6 +1,6 @@
 export const GameHeader = ({score, moves, onReset}) => {
     return <div className="game-header">
-        <h1>Memory Card Game</h1>
+        <h1>Pokémon Memory Game</h1>
         <div className="stats">
             <div className="stat-item"><span className="stat-label">Score:</span>
             <span className="stat-value">{score}</span></div>

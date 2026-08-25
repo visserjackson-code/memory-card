@@ -1,69 +1,65 @@
 import { GameHeader } from "./components/GameHeader"
 import { Card } from "./components/Card";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { WinMessage } from "./components/WinMessage";
 
 
 
+
+
+
 const getRandomPokemonSprite = async () => {
-  const dexNumber = Math.random * (1025 - 1 + 1) - 1
+  const dexNumber = Math.floor(Math.random() * 1024) + 1
   const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${dexNumber}`);
-  const data = await response.json;
+  const data = await response.json();
   return data.sprites.other.showdown.front_default ?? data.sprites.front_default;
 }
 
 
-const cardValues = [
-  "🍎",
-  "🍌",
-  "🍇",
-  "🍊",
-  "🍓",
-  "🥝",
-  "🍑",
-  "🍒",
-  "🍎",
-  "🍌",
-  "🍇",
-  "🍊",
-  "🍓",
-  "🥝",
-  "🍑",
-  "🍒",
-];
+const populateCards = async () => {
+    const pokemon = await Promise.all(
+      Array.from({length: 8}, getRandomPokemonSprite)
+    );
+    
+    const values = [...pokemon, ...pokemon];
 
-const createCards = () => {
-  const shuffled = [...cardValues];
+    for (let i = values.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [values [i], values[j]] = [values[j], values[i]]
+    }
 
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    return values.map((value, index) => ({
+      id: index, 
+      value,
+      isFlipped: false,
+      isMatched: false,
+    }))
   }
-
-  return shuffled.map((value, index) => ({
-    id: index,
-    value,
-    isFlipped: false,
-    isMatched: false,
-  }));
-};
 
 function App() {
 
-const [cards, setCards] = useState(createCards);
+const [cards, setCards] = useState([]);
 const [flippedCards, setFlippedCards] = useState([]);
 const [matchedCards, setMatchedCards] = useState([]);
 const [score, setScore] = useState(0);
 const [moves, setMoves] = useState(0);
 const [isLocked, setIsLocked] = useState(false)
 
-const initializeGame = () => {
-  setCards(createCards());
+useEffect(() => {
+  populateCards().then(setCards);
+
+}, []);
+
+const initializeGame = async () => {
+  setCards([]);
   setIsLocked(false);
   setScore(0);
   setMoves(0);
   setMatchedCards([]);
   setFlippedCards([]);
+
+  const newCards = await populateCards();
+  setCards(newCards);
 };
 
 const handleCardClick = (card) => {
@@ -135,7 +131,7 @@ const handleCardClick = (card) => {
   }
 }
 
-const isGameComplete = matchedCards.length === cardValues.length;
+const isGameComplete = cards.length > 0 && matchedCards.length === cards.length;
 
 
   return (

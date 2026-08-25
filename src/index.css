@@ -166,6 +166,8 @@ body {
   font-size: 3rem;
   z-index: 1;
   border: 2px solid rgba(255, 255, 255, 0.1);
+  visibility: visible;
+  opacity: 1;
 }
 
 .card-back {
