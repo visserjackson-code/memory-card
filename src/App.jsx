@@ -1,6 +1,6 @@
 import { GameHeader } from "./components/GameHeader"
 import { Card } from "./components/Card";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { WinMessage } from "./components/WinMessage";
 
 
@@ -23,48 +23,39 @@ const cardValues = [
   "🍒",
 ];
 
+const createCards = () => {
+  const shuffled = [...cardValues];
+
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+
+  return shuffled.map((value, index) => ({
+    id: index,
+    value,
+    isFlipped: false,
+    isMatched: false,
+  }));
+};
+
 function App() {
 
-const [cards, setCards] = useState([]);
+const [cards, setCards] = useState(createCards);
 const [flippedCards, setFlippedCards] = useState([]);
 const [matchedCards, setMatchedCards] = useState([]);
 const [score, setScore] = useState(0);
 const [moves, setMoves] = useState(0);
 const [isLocked, setIsLocked] = useState(false)
 
-const shuffleArray = (array) => {
-  const shuffled = [...array];
-  for(let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-  }
-  return shuffled;
-}
-
-const initalizeGame = () => {
-  //SHUFFLE THE CARDS
-  const shuffled = shuffleArray(cardValues);
-
-  const finalCards = shuffled.map((value, index) => ({
- 
-  id: index,
-  value,
-  isFlipped: false,
-  isMatched: false
-
-  }));
-
-  setCards(finalCards);
+const initializeGame = () => {
+  setCards(createCards());
   setIsLocked(false);
   setScore(0);
   setMoves(0);
   setMatchedCards([]);
   setFlippedCards([]);
-}
-
-useEffect(() => {
-    initalizeGame();
-}, [])
+};
 
 const handleCardClick = (card) => {
 // Don't allow clicking if card is already flipped or matched
@@ -141,7 +132,7 @@ const isGameComplete = matchedCards.length === cardValues.length;
   return (
     
    <div className="app">
-    <GameHeader score={score} moves={moves} onReset={initalizeGame}/>
+    <GameHeader score={score} moves={moves} onReset={initializeGame}/>
     {isGameComplete && <WinMessage moves={moves}/>}
     <div className="cards-grid">
       {cards.map((card) => (
